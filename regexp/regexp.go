@@ -21,8 +21,8 @@ type Regexp struct {
 }
 
 // String returns the source text used to compile the regular expression.
-func (re *Regexp) String() string {
-	return re.expr
+func (r *Regexp) String() string {
+	return r.expr
 }
 
 // Compile parses a regular expression and returns, if successful,
