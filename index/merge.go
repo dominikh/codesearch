@@ -26,7 +26,7 @@ package index
 // Now merge the posting lists (this is why they begin with the trigram).
 // During the merge, translate the docid numbers to the new C docid space.
 // Also during the merge, write the posting list index to a temporary file as usual.
-// 
+//
 // Copy the name index and posting list index into C's index and write the trailer.
 // Rename C's index onto the new index.
 
@@ -39,12 +39,6 @@ import (
 // An idrange records that the half-open interval [lo, hi) maps to [new, new+hi-lo).
 type idrange struct {
 	lo, hi, new uint32
-}
-
-type postIndex struct {
-	tri    uint32
-	count  uint32
-	offset uint32
 }
 
 // Merge creates a new index in the file dst that corresponds to merging
@@ -304,7 +298,6 @@ func (r *postMapReader) nextId() bool {
 type postDataWriter struct {
 	out           *bufWriter
 	postIndexFile *bufWriter
-	buf           [10]byte
 	base          uint32
 	count, offset uint32
 	last          uint32

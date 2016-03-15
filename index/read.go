@@ -129,15 +129,6 @@ func (ix *Index) uint32(off uint32) uint32 {
 	return binary.BigEndian.Uint32(ix.slice(off, 4))
 }
 
-// uvarint returns the varint value at the given offset in the index data.
-func (ix *Index) uvarint(off uint32) uint32 {
-	v, n := binary.Uvarint(ix.slice(off, -1))
-	if n <= 0 {
-		corrupt()
-	}
-	return uint32(v)
-}
-
 // Paths returns the list of indexed paths.
 func (ix *Index) Paths() []string {
 	off := ix.pathData
@@ -180,17 +171,6 @@ func (ix *Index) listAt(off uint32) (trigram, count, offset uint32) {
 	count = binary.BigEndian.Uint32(d[3:])
 	offset = binary.BigEndian.Uint32(d[3+4:])
 	return
-}
-
-func (ix *Index) dumpPosting() {
-	d := ix.slice(ix.postIndex, postEntrySize*ix.numPost)
-	for i := 0; i < ix.numPost; i++ {
-		j := i * postEntrySize
-		t := uint32(d[j])<<16 | uint32(d[j+1])<<8 | uint32(d[j+2])
-		count := int(binary.BigEndian.Uint32(d[j+3:]))
-		offset := binary.BigEndian.Uint32(d[j+3+4:])
-		log.Printf("%#x: %d at %d", t, count, offset)
-	}
 }
 
 func (ix *Index) findList(trigram uint32) (count int, offset uint32) {
