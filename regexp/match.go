@@ -14,7 +14,7 @@ import (
 	"regexp/syntax"
 	"sort"
 
-	"github.com/google/codesearch/sparse"
+	"honnef.co/go/codesearch/sparse"
 )
 
 // A matcher holds the state for running regular expression search.
