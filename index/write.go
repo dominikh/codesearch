@@ -31,8 +31,8 @@ import (
 // allow incremental updating of an existing index when a directory changes.
 // But we have not implemented that.
 
-// An IndexWriter creates an on-disk index corresponding to a set of files.
-type IndexWriter struct {
+// A Writer creates an on-disk index corresponding to a set of files.
+type Writer struct {
 	LogSkip bool // log information about skipped files
 	Verbose bool // log status using package log
 
@@ -56,9 +56,9 @@ type IndexWriter struct {
 
 const npost = 64 << 20 / 8 // 64 MB worth of post entries
 
-// Create returns a new IndexWriter that will write the index to file.
-func Create(file string) *IndexWriter {
-	return &IndexWriter{
+// Create returns a new Writer that will write the index to file.
+func Create(file string) *Writer {
+	return &Writer{
 		trigram:   sparse.NewSet(1 << 24),
 		nameData:  bufCreate(""),
 		nameIndex: bufCreate(""),
@@ -96,13 +96,13 @@ const (
 )
 
 // AddPaths adds the given paths to the index's list of paths.
-func (ix *IndexWriter) AddPaths(paths []string) {
+func (ix *Writer) AddPaths(paths []string) {
 	ix.paths = append(ix.paths, paths...)
 }
 
 // AddFile adds the file with the given name (opened using os.Open)
 // to the index.  It logs errors using package log.
-func (ix *IndexWriter) AddFile(name string) {
+func (ix *Writer) AddFile(name string) {
 	f, err := os.Open(name)
 	if err != nil {
 		log.Print(err)
@@ -114,7 +114,7 @@ func (ix *IndexWriter) AddFile(name string) {
 
 // Add adds the file f to the index under the given name.
 // It logs errors using package log.
-func (ix *IndexWriter) Add(name string, f io.Reader) {
+func (ix *Writer) Add(name string, f io.Reader) {
 	ix.trigram.Reset()
 	var (
 		c       = byte(0)
@@ -192,7 +192,7 @@ func (ix *IndexWriter) Add(name string, f io.Reader) {
 }
 
 // Flush flushes the index entry to the target file.
-func (ix *IndexWriter) Flush() {
+func (ix *Writer) Flush() {
 	ix.addName("")
 
 	var off [5]uint32
@@ -238,7 +238,7 @@ func copyFile(dst, src *bufWriter) {
 
 // addName adds the file with the given name to the index.
 // It returns the assigned file ID number.
-func (ix *IndexWriter) addName(name string) uint32 {
+func (ix *Writer) addName(name string) uint32 {
 	if strings.Contains(name, "\x00") {
 		log.Fatalf("%q: file has NUL byte in name", name)
 	}
@@ -253,7 +253,7 @@ func (ix *IndexWriter) addName(name string) uint32 {
 
 // flushPost writes ix.post to a new temporary file and
 // clears the slice.
-func (ix *IndexWriter) flushPost() {
+func (ix *Writer) flushPost() {
 	w, err := ioutil.TempFile("", "csearch-index")
 	if err != nil {
 		log.Fatal(err)
@@ -280,7 +280,7 @@ func (ix *IndexWriter) flushPost() {
 
 // mergePost reads the flushed index entries and merges them
 // into posting lists, writing the resulting lists to out.
-func (ix *IndexWriter) mergePost(out *bufWriter) {
+func (ix *Writer) mergePost(out *bufWriter) {
 	var h postHeap
 
 	log.Printf("merge %d files + mem", len(ix.postFile))
