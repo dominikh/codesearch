@@ -169,14 +169,14 @@ func Merge(dst, src1, src2 string) {
 	for {
 		if r1.trigram < r2.trigram {
 			w.trigram(r1.trigram)
-			for r1.nextId() {
+			for r1.nextID() {
 				w.fileid(r1.fileid)
 			}
 			r1.nextTrigram()
 			w.endTrigram()
 		} else if r2.trigram < r1.trigram {
 			w.trigram(r2.trigram)
-			for r2.nextId() {
+			for r2.nextID() {
 				w.fileid(r2.fileid)
 			}
 			r2.nextTrigram()
@@ -186,15 +186,15 @@ func Merge(dst, src1, src2 string) {
 				break
 			}
 			w.trigram(r1.trigram)
-			r1.nextId()
-			r2.nextId()
+			r1.nextID()
+			r2.nextID()
 			for r1.fileid < ^uint32(0) || r2.fileid < ^uint32(0) {
 				if r1.fileid < r2.fileid {
 					w.fileid(r1.fileid)
-					r1.nextId()
+					r1.nextID()
 				} else if r2.fileid < r1.fileid {
 					w.fileid(r2.fileid)
-					r2.nextId()
+					r2.nextID()
 				} else {
 					panic("merge: inconsistent index")
 				}
@@ -267,7 +267,7 @@ func (r *postMapReader) load() {
 	r.i = 0
 }
 
-func (r *postMapReader) nextId() bool {
+func (r *postMapReader) nextID() bool {
 	for r.count > 0 {
 		r.count--
 		delta64, n := binary.Uvarint(r.d)
