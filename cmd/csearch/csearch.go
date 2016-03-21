@@ -11,7 +11,7 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"honnef.co/go/codesearch/filter"
+	"honnef.co/go/codesearch/fs"
 	"honnef.co/go/codesearch/index"
 	"honnef.co/go/codesearch/regexp"
 )
@@ -133,18 +133,13 @@ func Main() {
 
 	for _, fileid := range post {
 		name := ix.Name(fileid)
-		f, err := os.Open(name)
+		f, err := fs.Open(name)
 		if err != nil {
 			// XXX
 			continue
 		}
-		rc, err := filter.Filter(f, name)
-		if err != nil {
-			// XXX
-			continue
-		}
-		g.Reader(rc, name)
-		_ = rc.Close()
+		g.Reader(f, name)
+		_ = f.Close()
 	}
 
 	matches = g.Match

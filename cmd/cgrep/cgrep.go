@@ -11,7 +11,7 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"honnef.co/go/codesearch/filter"
+	"honnef.co/go/codesearch/fs"
 	"honnef.co/go/codesearch/regexp"
 )
 
@@ -69,18 +69,13 @@ func main() {
 		g.Reader(os.Stdin, "<standard input>")
 	} else {
 		for _, arg := range args[1:] {
-			f, err := os.Open(arg)
+			f, err := fs.Open(arg)
 			if err != nil {
 				// XXX
 				continue
 			}
-			rc, err := filter.Filter(f, arg)
-			if err != nil {
-				// XXX
-				continue
-			}
-			g.Reader(rc, arg)
-			_ = rc.Close()
+			g.Reader(f, arg)
+			_ = f.Close()
 		}
 	}
 	if !g.Match {
