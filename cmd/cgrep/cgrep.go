@@ -11,7 +11,7 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"honnef.co/go/codesearch/fs"
+	"honnef.co/go/codesearch/internal/fs"
 	"honnef.co/go/codesearch/regexp"
 )
 

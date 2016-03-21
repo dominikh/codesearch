@@ -13,8 +13,8 @@ import (
 	"runtime/pprof"
 	"sort"
 
-	"honnef.co/go/codesearch/fs"
 	"honnef.co/go/codesearch/index"
+	"honnef.co/go/codesearch/internal/fs"
 )
 
 var usageMessage = `usage: cindex [-list] [-reset] [path...]

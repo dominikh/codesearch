@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"honnef.co/go/codesearch/filter"
+	"honnef.co/go/codesearch/internal/filter"
 )
 
 // Open opens a file and wraps it in a series of file-specific
