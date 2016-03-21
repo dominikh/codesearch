@@ -17,7 +17,9 @@ import (
 	"honnef.co/go/codesearch/regexp"
 )
 
-var usageMessage = `usage: csearch [-c] [-f fileregexp] [-h] [-i] [-l] [-n] regexp
+// FIXME(dominikh): update usage string
+
+var usageMessage = `usage: csearch [-c] [-f fileregexp] [-h] [-i] [-l] [-n] regexp [dirs...]
 
 Csearch behaves like grep over all indexed files, searching for regexp,
 an RE2 (nearly PCRE) regular expression.
@@ -90,9 +92,12 @@ func Main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if len(args) != 1 {
+	if len(args) < 1 {
 		usage()
 	}
+
+	pattern := args[0]
+	dirs := args[1:]
 
 	if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
@@ -104,7 +109,7 @@ func Main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	pat := "(?m)" + args[0]
+	pat := "(?m)" + pattern
 	if *fCaseInsensitive {
 		pat = "(?i)" + pat
 	}
@@ -147,6 +152,9 @@ func Main() {
 			continue
 		}
 		if len(fExclude) > 0 && fs.MatchAny(fExclude, name) {
+			continue
+		}
+		if len(dirs) > 0 && !fs.IsInDirs(dirs, name) {
 			continue
 		}
 		fnames = append(fnames, fileid)

@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"honnef.co/go/codesearch/filter"
 )
@@ -36,6 +37,23 @@ func Match(glob, path string) bool {
 func MatchAny(globs []string, path string) bool {
 	for _, glob := range globs {
 		if Match(glob, path) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsInDirs reports whether a path lies under one of the directories.
+func IsInDirs(dirs []string, path string) bool {
+	for _, dir := range dirs {
+		if dir == path {
+			return true
+		}
+		if len(path) < len(dir) {
+			continue
+		}
+		if strings.HasPrefix(path, dir) &&
+			(dir[len(dir)-1] == filepath.Separator || path[len(dir)] == filepath.Separator) {
 			return true
 		}
 	}
