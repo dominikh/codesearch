@@ -161,7 +161,9 @@ func Main() {
 		name := ix.Name(fileid)
 		f, err := fs.Open(name)
 		if err != nil {
-			// XXX
+			if *fVerbose {
+				log.Println(err)
+			}
 			continue
 		}
 		g.Reader(f, name)
