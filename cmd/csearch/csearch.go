@@ -47,11 +47,11 @@ func usage() {
 }
 
 var (
-	fFlag       = flag.String("f", "", "search only files with names matching this regexp")
-	iFlag       = flag.Bool("i", false, "case-insensitive search")
-	verboseFlag = flag.Bool("verbose", false, "print extra information")
-	bruteFlag   = flag.Bool("brute", false, "brute force - search all files in index")
-	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to this file")
+	fFilter          = flag.String("f", "", "search only files with names matching this regexp")
+	fCaseInsensitive = flag.Bool("i", false, "case-insensitive search")
+	fVerbose         = flag.Bool("verbose", false, "print extra information")
+	fBrute           = flag.Bool("brute", false, "brute force - search all files in index")
+	cpuProfile       = flag.String("cpuprofile", "", "write cpu profile to this file")
 
 	matches bool
 )
@@ -82,7 +82,7 @@ func Main() {
 	}
 
 	pat := "(?m)" + args[0]
-	if *iFlag {
+	if *fCaseInsensitive {
 		pat = "(?i)" + pat
 	}
 	re, err := regexp.Compile(pat)
@@ -91,26 +91,26 @@ func Main() {
 	}
 	g.Regexp = re
 	var fre *regexp.Regexp
-	if *fFlag != "" {
-		fre, err = regexp.Compile(*fFlag)
+	if *fFilter != "" {
+		fre, err = regexp.Compile(*fFilter)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 	q := index.RegexpQuery(re.Syntax)
-	if *verboseFlag {
+	if *fVerbose {
 		log.Printf("query: %s\n", q)
 	}
 
 	ix := index.Open(index.File())
-	ix.Verbose = *verboseFlag
+	ix.Verbose = *fVerbose
 	var post []uint32
-	if *bruteFlag {
+	if *fBrute {
 		post = ix.PostingQuery(&index.Query{Op: index.QAll})
 	} else {
 		post = ix.PostingQuery(q)
 	}
-	if *verboseFlag {
+	if *fVerbose {
 		log.Printf("post query identified %d possible files\n", len(post))
 	}
 
@@ -125,7 +125,7 @@ func Main() {
 			fnames = append(fnames, fileid)
 		}
 
-		if *verboseFlag {
+		if *fVerbose {
 			log.Printf("filename regexp matched %d files\n", len(fnames))
 		}
 		post = fnames

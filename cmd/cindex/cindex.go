@@ -55,10 +55,10 @@ func usage() {
 }
 
 var (
-	listFlag    = flag.Bool("list", false, "list indexed paths and exit")
-	resetFlag   = flag.Bool("reset", false, "discard existing index")
-	verboseFlag = flag.Bool("verbose", false, "print extra information")
-	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to this file")
+	fList      = flag.Bool("list", false, "list indexed paths and exit")
+	fReset     = flag.Bool("reset", false, "discard existing index")
+	fVerbose   = flag.Bool("verbose", false, "print extra information")
+	cpuProfile = flag.String("cpuprofile", "", "write cpu profile to this file")
 )
 
 func main() {
@@ -66,7 +66,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if *listFlag {
+	if *fList {
 		ix := index.Open(index.File())
 		for _, arg := range ix.Paths() {
 			fmt.Printf("%s\n", arg)
@@ -84,7 +84,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	if *resetFlag && len(args) == 0 {
+	if *fReset && len(args) == 0 {
 		os.Remove(index.File())
 		return
 	}
@@ -115,15 +115,15 @@ func main() {
 	master := index.File()
 	if _, err := os.Stat(master); err != nil {
 		// Does not exist.
-		*resetFlag = true
+		*fReset = true
 	}
 	file := master
-	if !*resetFlag {
+	if !*fReset {
 		file += "~"
 	}
 
 	ix := index.Create(file)
-	ix.Verbose = *verboseFlag
+	ix.Verbose = *fVerbose
 	ix.AddPaths(args)
 	for _, arg := range args {
 		log.Printf("index %s", arg)
@@ -157,7 +157,7 @@ func main() {
 	log.Printf("flush index")
 	ix.Flush()
 
-	if !*resetFlag {
+	if !*fReset {
 		log.Printf("merge %s %s", master, file)
 		index.Merge(file+"~", master, file)
 		os.Remove(file)

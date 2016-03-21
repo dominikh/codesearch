@@ -30,8 +30,8 @@ func usage() {
 }
 
 var (
-	iflag      = flag.Bool("i", false, "case-insensitive match")
-	cpuProfile = flag.String("cpuprofile", "", "write cpu profile to this file")
+	fCaseInsensitive = flag.Bool("i", false, "case-insensitive match")
+	cpuProfile       = flag.String("cpuprofile", "", "write cpu profile to this file")
 )
 
 func main() {
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	pat := "(?m)" + args[0]
-	if *iflag {
+	if *fCaseInsensitive {
 		pat = "(?i)" + pat
 	}
 	re, err := regexp.Compile(pat)
