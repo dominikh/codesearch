@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"os"
 	"regexp/syntax"
 	"sort"
 
@@ -367,16 +366,6 @@ func (g *Grep) AddFlags() {
 	flag.BoolVar(&g.C, "c", false, "print match counts only")
 	flag.BoolVar(&g.N, "n", false, "show line numbers")
 	flag.BoolVar(&g.H, "h", false, "omit file names")
-}
-
-func (g *Grep) File(name string) {
-	f, err := os.Open(name)
-	if err != nil {
-		fmt.Fprintf(g.Stderr, "%s\n", err)
-		return
-	}
-	defer f.Close()
-	g.Reader(f, name)
 }
 
 var nl = []byte{'\n'}

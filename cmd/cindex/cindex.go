@@ -13,6 +13,7 @@ import (
 	"runtime/pprof"
 	"sort"
 
+	"honnef.co/go/codesearch/filter"
 	"honnef.co/go/codesearch/index"
 )
 
@@ -144,9 +145,17 @@ func main() {
 				f, err := os.Open(path)
 				if err != nil {
 					// XXX
+					log.Println(err)
+					return nil
 				}
-				ix.Add(path, f)
-				_ = f.Close()
+				rc, err := filter.Filter(f, path)
+				if err != nil {
+					// XXX
+					log.Println(err)
+					return nil
+				}
+				ix.Add(path, rc)
+				_ = rc.Close()
 			}
 			return nil
 		})
