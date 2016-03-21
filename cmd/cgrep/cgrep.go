@@ -12,7 +12,7 @@ import (
 	"runtime/pprof"
 
 	"honnef.co/go/codesearch/internal/fs"
-	"honnef.co/go/codesearch/regexp"
+	"honnef.co/go/codesearch/internal/regexp"
 )
 
 var usageMessage = `usage: cgrep [-c] [-h] [-i] [-l] [-n] regexp [file...]
