@@ -130,7 +130,7 @@ func main() {
 		filepath.Walk(arg, func(path string, info os.FileInfo, err error) error {
 			if _, elem := filepath.Split(path); elem != "" {
 				// Skip various temporary or "hidden" files or directories.
-				if elem[0] == '.' || elem[0] == '#' || elem[0] == '~' || elem[len(elem)-1] == '~' {
+				if elem[0] == '.' || elem[0] == '~' || elem[len(elem)-1] == '~' {
 					if info.IsDir() {
 						return filepath.SkipDir
 					}
