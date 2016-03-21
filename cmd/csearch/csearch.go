@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
+	"strings"
 
 	"honnef.co/go/codesearch/fs"
 	"honnef.co/go/codesearch/index"
@@ -46,7 +47,24 @@ func usage() {
 	os.Exit(2)
 }
 
+type globsFlag []string
+
+func (s *globsFlag) String() string {
+	return strings.Join(*s, " ")
+}
+
+func (s *globsFlag) Set(v string) error {
+	if !fs.ValidGlob(v) {
+		return fmt.Errorf("%q is an invalid glob", v)
+	}
+	*s = append(*s, v)
+	return nil
+}
+
 var (
+	fInclude globsFlag
+	fExclude globsFlag
+
 	fFilter          = flag.String("f", "", "search only files with names matching this regexp")
 	fCaseInsensitive = flag.Bool("i", false, "case-insensitive search")
 	fVerbose         = flag.Bool("verbose", false, "print extra information")
@@ -55,6 +73,11 @@ var (
 
 	matches bool
 )
+
+func init() {
+	flag.Var(&fInclude, "include", "Only search files whose base name matches `glob`")
+	flag.Var(&fExclude, "exclude", "Skip files whose base name matches `glob`")
+}
 
 func Main() {
 	g := regexp.Grep{
@@ -114,22 +137,25 @@ func Main() {
 		log.Printf("post query identified %d possible files\n", len(post))
 	}
 
-	if fre != nil {
-		fnames := make([]uint32, 0, len(post))
-
-		for _, fileid := range post {
-			name := ix.Name(fileid)
-			if fre.MatchString(name, true, true) < 0 {
-				continue
-			}
-			fnames = append(fnames, fileid)
+	fnames := make([]uint32, 0, len(post))
+	for _, fileid := range post {
+		name := ix.Name(fileid)
+		if fre != nil && fre.MatchString(name, true, true) < 0 {
+			continue
 		}
-
-		if *fVerbose {
-			log.Printf("filename regexp matched %d files\n", len(fnames))
+		if len(fInclude) > 0 && !fs.MatchAny(fInclude, name) {
+			continue
 		}
-		post = fnames
+		if len(fExclude) > 0 && fs.MatchAny(fExclude, name) {
+			continue
+		}
+		fnames = append(fnames, fileid)
 	}
+
+	if *fVerbose {
+		log.Printf("filename regexp matched %d files\n", len(fnames))
+	}
+	post = fnames
 
 	for _, fileid := range post {
 		name := ix.Name(fileid)
