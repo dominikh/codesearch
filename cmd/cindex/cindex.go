@@ -141,7 +141,12 @@ func main() {
 				return nil
 			}
 			if info != nil && info.Mode()&os.ModeType == 0 {
-				ix.AddFile(path)
+				f, err := os.Open(path)
+				if err != nil {
+					// XXX
+				}
+				ix.Add(path, f)
+				_ = f.Close()
 			}
 			return nil
 		})

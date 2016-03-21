@@ -100,18 +100,6 @@ func (ix *Writer) AddPaths(paths []string) {
 	ix.paths = append(ix.paths, paths...)
 }
 
-// AddFile adds the file with the given name (opened using os.Open)
-// to the index.  It logs errors using package log.
-func (ix *Writer) AddFile(name string) {
-	f, err := os.Open(name)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-	defer f.Close()
-	ix.Add(name, f)
-}
-
 // Add adds the file f to the index under the given name.
 // It logs errors using package log.
 func (ix *Writer) Add(name string, f io.Reader) {
